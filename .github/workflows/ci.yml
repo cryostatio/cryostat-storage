@@ -1,0 +1,56 @@
+name: CI build and push
+
+concurrency:
+  group: ci-${{ github.run_id }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - v[0-9]+
+      - v[0-9]+.[0-9]+
+      - cryostat-v[0-9]+.[0-9]+
+
+env:
+  CI_USER: cryostat+bot
+  CI_REGISTRY: quay.io/cryostat
+  CI_IMG: quay.io/cryostat/cryostat-storage
+  REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  REF: ${{ github.event.pull_request.head.ref }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install qemu
+      continue-on-error: false
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static
+    - name: Get date tag
+      run: echo "DATE_TAG=$(date -uI)" >> "$GITHUB_ENV"
+    - name: Build container images and manifest
+      id: buildah-build
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ${{ env.CI_IMG }}
+        archs: amd64, arm64
+        tags: ${{ github.ref_name }} ${{ github.ref == 'refs/heads/main' && 'latest' || '' }} ${{ env.DATE_TAG }}
+        containerfiles: |
+          ./Dockerfile
+    - name: Push to quay.io
+      id: push-to-quay
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: cryostat-storage
+        tags: ${{ steps.buildah-build.outputs.tags }}
+        registry: ${{ env.CI_REGISTRY }}
+        username: ${{ env.CI_USER }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+      if: ${{ github.repository_owner == 'cryostatio' }}
+    - name: Print image URL
+      run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+      if: ${{ github.repository_owner == 'cryostatio' }}
