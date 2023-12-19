@@ -1,4 +1,4 @@
-FROM docker.io/minio/minio:latest
+FROM docker.io/minio/minio:RELEASE.2023-12-14T18-51-57Z
 
 ENV MINIO_USER minio
 ENV MINIO_UID_GID 5001
