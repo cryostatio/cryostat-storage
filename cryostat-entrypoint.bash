@@ -15,7 +15,7 @@ set -xe
 cfg="$(mktemp)"
 envsubst '$CRYOSTAT_ACCESS_KEY $CRYOSTAT_SECRET_KEY' < /etc/seaweed_conf.template.json > "${cfg}"
 
-exec /usr/local/bin/weed \
+exec /usr/local/entrypoint.sh \
     server -dir="${DATA_DIR:-/data}" \
     -s3 -s3.config="${cfg}" \
     "$@"
