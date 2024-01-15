@@ -1,0 +1,28 @@
+{
+  "identities": [
+    {
+      "name": "anonymous",
+      "actions": [
+        "Read"
+      ]
+    },
+    {
+      "name": "cryostat",
+      "credentials": [
+        {
+          "accessKey": "$CRYOSTAT_ACCESS_KEY",
+          "secretKey": "$CRYOSTAT_SECRET_KEY"
+        }
+      ],
+      "actions": [
+        "Admin",
+        "Read",
+        "ReadAcp",
+        "List",
+        "Tagging",
+        "Write",
+        "WriteAcp"
+      ]
+    }
+  ]
+}
