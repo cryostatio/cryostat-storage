@@ -1,10 +1,10 @@
-FROM docker.io/minio/minio:RELEASE.2023-12-14T18-51-57Z
+FROM registry.access.redhat.com/ubi8/ubi:8.9 AS builder
+ARG ref=master
+RUN dnf install -y go git make
+RUN git clone --depth 1 --branch $ref https://github.com/seaweedfs/seaweedfs \
+    && pushd seaweedfs/weed \
+    && make install
 
-ENV MINIO_USER minio
-ENV MINIO_UID_GID 5001
-
-RUN echo "${MINIO_USER}:x:${MINIO_UID_GID}:${MINIO_UID_GID}:${MINIO_USER}:/home/${MINIO_USER}:/sbin/nologin" >> /etc/passwd && \
-    echo "${MINIO_USER}:x:${MINIO_UID_GID}:" >> /etc/group && \
-    mkdir "/home/${MINIO_USER}"
-
-USER 5001
+FROM registry.access.redhat.com/ubi8/ubi-micro:8.9
+COPY --from=builder /root/go/bin/weed /usr/bin/weed
+ENTRYPOINT ["/usr/bin/weed"]
