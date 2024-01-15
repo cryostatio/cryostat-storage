@@ -12,9 +12,7 @@ RUN dnf install -y go git make gettext \
     && popd
 
 FROM registry.access.redhat.com/ubi8/ubi-micro:${runner_version}
-COPY --from=builder /usr/bin/envsubst /usr/bin/
-COPY --from=builder /root/go/bin/weed /usr/bin/weed
-COPY --from=builder /root/seaweedfs/docker/entrypoint.sh /usr/local
-COPY ./cryostat-entrypoint.bash /usr/local/
+COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /root/seaweedfs/docker/entrypoint.sh /usr/bin/
+COPY ./cryostat-entrypoint.bash /usr/bin/
 COPY seaweed_conf.template.json /etc/seaweed_conf.template.json
-ENTRYPOINT ["/usr/local/cryostat-entrypoint.bash"]
+ENTRYPOINT ["/usr/bin/cryostat-entrypoint.bash"]
