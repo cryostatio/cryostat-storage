@@ -47,7 +47,8 @@ done
 
 createBuckets "${names[@]}" &
 
-exec /usr/bin/entrypoint.sh \
-    server -dir="${DATA_DIR:-/tmp}" \
+exec weed -logtostderr=true server \
+    -dir="${DATA_DIR:-/tmp}" \
+    -master.volumePreallocate -volume.max="${VOLUME_MAX:-0}" -master.volumeSizeLimitMB=4096 \
     -s3 -s3.config="${cfg}" \
     "$@"
