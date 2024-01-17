@@ -49,6 +49,6 @@ createBuckets "${names[@]}" &
 
 exec weed -logtostderr=true server \
     -dir="${DATA_DIR:-/tmp}" \
-    -master.volumePreallocate -volume.max="${VOLUME_MAX:-0}" -master.volumeSizeLimitMB=4096 \
+    -master.volumePreallocate="${VOLUME_PREALLOCATE:-true}" -volume.max="${VOLUME_MAX:-0}" -master.volumeSizeLimitMB="${VOLUME_SIZE_LIMIT_MB:-4096}" \
     -s3 -s3.config="${cfg}" \
     "$@"
