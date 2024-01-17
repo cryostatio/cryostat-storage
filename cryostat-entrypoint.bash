@@ -17,6 +17,7 @@ envsubst '$CRYOSTAT_ACCESS_KEY $CRYOSTAT_SECRET_KEY' < /etc/seaweed_conf.templat
 
 function waitForStartup() {
     echo "cluster.check" | timeout "${BUCKET_CREATION_STARTUP_SECONDS:-30}"s weed shell 1>/dev/null 2>/dev/null || true
+    sleep "${BUCKET_CREATION_DELAY_SECONDS:-5}"
 }
 
 function createBucket() {
