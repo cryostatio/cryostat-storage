@@ -15,25 +15,37 @@ set -xe
 cfg="$(mktemp)"
 envsubst '$CRYOSTAT_ACCESS_KEY $CRYOSTAT_SECRET_KEY' < /etc/seaweed_conf.template.json > "${cfg}"
 
+function waitForStartup() {
+    echo "cluster.check" | timeout "${BUCKET_CREATION_STARTUP_SECONDS:-30}"s weed shell 1>/dev/null 2>/dev/null || true
+    sleep "${BUCKET_CREATION_DELAY_SECONDS:-5}"
+}
+
+function createBucket() {
+    echo "s3.bucket.create -name $1" | timeout "${BUCKET_CREATION_TIMEOUT_SECONDS:-5}"s weed shell
+}
+
 function createBuckets() {
-    for i in $(echo "$CRYOSTAT_BUCKETS" | tr ',' '\n'); do
-        local len
-        len="${#i}"
-        if [ "${len}" -lt 3 ]; then
-            echo "Bucket names must be at least 3 characters"
-            exit 1
-        fi
-        if [ "${len}" -gt 63 ]; then
-            echo "Bucket names must be at most 63 characters"
-            exit 1
-        fi
-        local cmd
-        # FIXME do something better than sleeping here
-        cmd="sleep ${BUCKET_CREATION_STARTUP_SECONDS:-30} ; echo \"s3.bucket.create -name ${i}\" | weed shell"
-        bash -c "${cmd}" &
+    waitForStartup
+    for name in "${names[@]}"; do
+        createBucket "${name}"
     done
 }
-createBuckets
+
+names=()
+for i in $(echo "$CRYOSTAT_BUCKETS" | tr ',' '\n'); do
+    len="${#i}"
+    if [ "${len}" -lt 3 ]; then
+        echo "Bucket names must be at least 3 characters"
+        exit 1
+    fi
+    if [ "${len}" -gt 63 ]; then
+        echo "Bucket names must be at most 63 characters"
+        exit 1
+    fi
+    names+=("${i}")
+done
+
+createBuckets "${names[@]}" &
 
 exec /usr/bin/entrypoint.sh \
     server -dir="${DATA_DIR:-/tmp}" \
