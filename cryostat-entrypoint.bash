@@ -26,7 +26,7 @@ function createBucket() {
 
 function createBuckets() {
     waitForStartup
-    for name in "${names[@]}"; do
+    for name in "$@"; do
         createBucket "${name}"
     done
 }
