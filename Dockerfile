@@ -1,10 +1,18 @@
-FROM docker.io/minio/minio:RELEASE.2023-12-14T18-51-57Z
+ARG builder_version=8.9
+ARG runner_version=8.9
 
-ENV MINIO_USER minio
-ENV MINIO_UID_GID 5001
+FROM registry.access.redhat.com/ubi8/ubi:${builder_version} AS builder
+ARG ref=master
+RUN dnf install -y go git make gettext \
+    && pushd /root \
+    && git clone --depth 1 --branch $ref https://github.com/seaweedfs/seaweedfs \
+    && pushd seaweedfs/weed \
+    && make install \
+    && popd \
+    && popd
 
-RUN echo "${MINIO_USER}:x:${MINIO_UID_GID}:${MINIO_UID_GID}:${MINIO_USER}:/home/${MINIO_USER}:/sbin/nologin" >> /etc/passwd && \
-    echo "${MINIO_USER}:x:${MINIO_UID_GID}:" >> /etc/group && \
-    mkdir "/home/${MINIO_USER}"
-
-USER 5001
+FROM registry.access.redhat.com/ubi8/ubi-micro:${runner_version}
+COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /root/seaweedfs/docker/entrypoint.sh /usr/bin/
+COPY ./cryostat-entrypoint.bash /usr/bin/
+COPY seaweed_conf.template.json /etc/seaweed_conf.template.json
+ENTRYPOINT ["/usr/bin/cryostat-entrypoint.bash"]

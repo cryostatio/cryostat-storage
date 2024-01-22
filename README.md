@@ -4,7 +4,7 @@
 [![Image Repository on Quay](https://quay.io/repository/cryostat/cryostat-storage/status "Image Repository on Quay")](https://quay.io/repository/cryostat/cryostat-storage)
 [![Google Group : Cryostat Development](https://img.shields.io/badge/Google%20Group-Cryostat%20Development-blue.svg)](https://groups.google.com/g/cryostat-development)
 
-This is a lightly customized [Minio](https://github.com/minio/minio) storage image for use by [cryostat](https://github.com/cryostatio/cryostat3).
+This is a lightly customized [SeaweedFS](https://github.com/seaweedfs/seaweedfs) storage image for use by [cryostat](https://github.com/cryostatio/cryostat3).
 
 ## CONTRIBUTING
 
