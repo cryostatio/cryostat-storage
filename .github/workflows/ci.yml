@@ -36,6 +36,8 @@ jobs:
       run: echo "DATE_TAG=$(date -uI)" >> "$GITHUB_ENV"
     - name: Get SeaweedFS release ref
       run: echo "SEAWEED_REF=$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)"
+      env:
+        GH_TOKEN: ${{ github.token }}
     - name: Build container images and manifest
       id: buildah-build
       uses: redhat-actions/buildah-build@v2
