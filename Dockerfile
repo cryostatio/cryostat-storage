@@ -26,4 +26,5 @@ LABEL seaweedfs.version=$ref golang.version=$goversion
 COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /usr/bin/
 COPY ./cryostat-entrypoint.bash /usr/bin/
 COPY seaweed_conf.template.json /etc/seaweed_conf.template.json
+USER 185
 ENTRYPOINT ["/usr/bin/cryostat-entrypoint.bash"]
