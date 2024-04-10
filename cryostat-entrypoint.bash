@@ -47,8 +47,19 @@ done
 
 createBuckets "${names[@]}" &
 
+FLAGS=()
+
+if [ -n "${VOLUME_MAX}" ]; then
+    FLAGS+=("-volume.max=${VOLUME_MAX}")
+fi
+
+if [ -n "${VOLUME_SIZE_LIMIT_MB}" ]; then
+    FLAGS+=("-master.volumeSizeLimitMB=${VOLUME_SIZE_LIMIT_MB}")
+fi
+
 exec weed -logtostderr=true server \
     -dir="${DATA_DIR:-/tmp}" \
-    -master.volumePreallocate="${VOLUME_PREALLOCATE:-true}" -volume.max="${VOLUME_MAX:-0}" -master.volumeSizeLimitMB="${VOLUME_SIZE_LIMIT_MB:-4096}" \
+    -master.volumePreallocate="${VOLUME_PREALLOCATE:-false}" \
+    "${FLAGS[@]}" \
     -s3 -s3.config="${cfg}" \
     "$@"
