@@ -47,15 +47,13 @@ done
 
 createBuckets "${names[@]}" &
 
-FLAGS=()
+VOLUME_MIN=40
 
-if [ -n "${VOLUME_MAX}" ]; then
-    FLAGS+=("-volume.max=${VOLUME_MAX}")
-fi
-
-if [ -n "${VOLUME_SIZE_LIMIT_MB}" ]; then
-    FLAGS+=("-master.volumeSizeLimitMB=${VOLUME_SIZE_LIMIT_MB}")
-fi
+FLAGS=(
+    "-volume.max=$(( VOLUME_MAX > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))"
+    "-volume.fileSizeLimitMB=${FILE_SIZE_LIMIT_MB:-4096}"
+    "-master.volumeSizeLimitMB=${VOLUME_SIZE_LIMIT_MB:-256}"
+)
 
 exec weed -logtostderr=true server \
     -dir="${DATA_DIR:-/tmp}" \
