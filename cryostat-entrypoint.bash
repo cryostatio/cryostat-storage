@@ -49,12 +49,14 @@ createBuckets "${names[@]}" &
 
 VOLUME_MIN=40
 NUM_VOLUMES=$(( VOLUME_MAX > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
-STORAGE_CAPACITY=${STORAGE_CAPACITY:-10GB}
+DATA_DIR="${DATA_DIR:-/tmp}"
+AVAILABLE_DISK_BYTES="$(df -P -B1 "${DATA_DIR}" | tail -1 | tr -s ' ' | cut -d' ' -f 4)"
+STORAGE_CAPACITY=${STORAGE_CAPACITY:-${AVAILABLE_DISK_BYTES}}
 STORAGE_CAPACITY_BYTES=$(echo "${STORAGE_CAPACITY}" | numfmt --from=iec --suffix=B | tr -d 'B')
 VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
 
 exec weed -logtostderr=true server \
-    -dir="${DATA_DIR:-/tmp}" \
+    -dir="${DATA_DIR}" \
     -volume.max=${NUM_VOLUMES} \
     -volume.fileSizeLimitMB="${FILE_SIZE_LIMIT_MB:-4096}" \
     -master.volumeSizeLimitMB="$(( "${VOLUME_SIZE_BYTES}" / 1024 / 1024 ))" \
