@@ -48,16 +48,16 @@ done
 createBuckets "${names[@]}" &
 
 VOLUME_MIN=40
-
-FLAGS=(
-    "-volume.max=$(( VOLUME_MAX > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))"
-    "-volume.fileSizeLimitMB=${FILE_SIZE_LIMIT_MB:-4096}"
-    "-master.volumeSizeLimitMB=${VOLUME_SIZE_LIMIT_MB:-256}"
-)
+NUM_VOLUMES=$(( VOLUME_MAX > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
+STORAGE_CAPACITY=${STORAGE_CAPACITY:-10GB}
+STORAGE_CAPACITY_BYTES=$(echo "${STORAGE_CAPACITY}" | numfmt --from=iec --suffix=B | tr -d 'B')
+VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
 
 exec weed -logtostderr=true server \
     -dir="${DATA_DIR:-/tmp}" \
+    -volume.max=${NUM_VOLUMES} \
+    -volume.fileSizeLimitMB="${FILE_SIZE_LIMIT_MB:-4096}" \
+    -master.volumeSizeLimitMB="$(( "${VOLUME_SIZE_BYTES}" / 1024 / 1024 ))" \
     -master.volumePreallocate="${VOLUME_PREALLOCATE:-false}" \
-    "${FLAGS[@]}" \
     -s3 -s3.config="${cfg}" \
     "$@"
