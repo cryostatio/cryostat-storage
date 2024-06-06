@@ -34,6 +34,21 @@ jobs:
         sudo apt-get install -y qemu-user-static
     - name: Get date tag
       run: echo "DATE_TAG=$(date -uI)" >> "$GITHUB_ENV"
+    - name: Check release branch
+      id: check-branch
+      run: |
+        if [[ ${REF_NAME} == cryostat-v* ]]; then
+          echo "image-tag=${REF_NAME:10}-dev" >> $GITHUB_OUTPUT
+        else
+          echo "image-tag=${REF_NAME}" >> $GITHUB_OUTPUT
+        fi
+    - name: Check commit git tag
+      id: check-commit
+      run: |
+        output=$(git describe --tags --exact-match 2>/dev/null | sed -e "s/^v//" || echo -n '')
+        echo "::set-output name=image-tag::$output"
+        echo "::set-output name=image-tag-patch::${output:0:3}"
+        echo "::set-output name=image-tag-release::${output:0:1}"
     - name: Get SeaweedFS release ref
       run: echo "SEAWEED_REF=$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
       env:
@@ -44,7 +59,7 @@ jobs:
       with:
         image: ${{ env.CI_IMG }}
         archs: amd64, arm64
-        tags: ${{ github.ref_name }} ${{ github.ref == 'refs/heads/main' && 'latest' || '' }} ${{ env.DATE_TAG }}
+        tags: ${{ github.ref_name }} ${{ github.ref == 'refs/heads/main' && 'latest' || '' }} ${{ env.DATE_TAG }} ${{ steps.check-branch.outputs.image-tag }} ${{ steps.check-commit.outputs.image-tag }} ${{ steps.check-commit.outputs.image-tag-patch }} ${{ steps.check-commit.outputs.image-tag-release }}
         build-args: |
           ref=${{ env.SEAWEED_REF }}
         containerfiles: |
