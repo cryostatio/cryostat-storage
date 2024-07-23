@@ -1,7 +1,7 @@
 ARG builder_version=8.10
 ARG runner_version=8.10
 ARG ref=master
-ARG goversion=1.22.4
+ARG goversion=1.22.5
 
 FROM registry.access.redhat.com/ubi8/ubi:${builder_version} AS builder
 ARG ref
