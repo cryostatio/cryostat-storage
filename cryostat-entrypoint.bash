@@ -10,17 +10,23 @@ if [ -z "${CRYOSTAT_SECRET_KEY}" ]; then
     exit 2
 fi
 
-set -xe
+set -x
 
 cfg="$(mktemp)"
+# shellcheck disable=SC2016
 envsubst '$CRYOSTAT_ACCESS_KEY $CRYOSTAT_SECRET_KEY' < /etc/seaweed_conf.template.json > "${cfg}"
 
 function waitForStartup() {
-    echo "cluster.check" | timeout "${BUCKET_CREATION_STARTUP_SECONDS:-30}"s weed shell 1>/dev/null 2>/dev/null || true
-    sleep "${BUCKET_CREATION_DELAY_SECONDS:-5}"
+    while ! echo "cluster.check" | timeout 2s weed shell >/dev/null 2>&1 ; do
+        echo "Waiting for cluster to be ready for bucket creation..."
+        sleep "${BUCKET_CREATION_STARTUP_SECONDS:-10}"
+    done
+    echo "Cluster ready for bucket creation."
+    sleep "${BUCKET_CREATION_DELAY_SECONDS:-$BUCKET_CREATION_STARTUP_SECONDS}"
 }
 
 function createBucket() {
+    echo "Creating S3 bucket $1"
     echo "s3.bucket.create -name $1" | timeout "${BUCKET_CREATION_TIMEOUT_SECONDS:-5}"s weed shell
 }
 
@@ -47,8 +53,10 @@ done
 
 createBuckets "${names[@]}" &
 
+set -e
+
 VOLUME_MIN=40
-NUM_VOLUMES=$(( VOLUME_MAX > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
+NUM_VOLUMES=$(( ${VOLUME_MAX:-0} > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
 DATA_DIR="${DATA_DIR:-/tmp}"
 AVAILABLE_DISK_BYTES="$(df -P -B1 "${DATA_DIR}" | tail -1 | tr -s ' ' | cut -d' ' -f 4)"
 STORAGE_CAPACITY=${STORAGE_CAPACITY:-${AVAILABLE_DISK_BYTES}}
