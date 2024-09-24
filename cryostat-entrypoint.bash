@@ -65,12 +65,17 @@ VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
 
 FLAGS=(
     "-filer.allowedOrigins=0.0.0.0"
-    "-filer.exposeDirectoryData=false"
-    "-filer.disableDirListing"
-    "-webdav=false"
 )
 
-if [ -z "${DISABLE_REST_ENCRYPTION}" ]; then
+if [ "${DIR_LISTING_ENABLE:-0}" != 1 ]; then
+    FLAGS+=(
+        "-filer.exposeDirectoryData=false"
+        "-filer.disableDirListing"
+        "-webdav=false"
+    )
+fi
+
+if [ "${REST_ENCRYPTION_ENABLE:-1}" = 1 ]; then
     FLAGS+=("-filer.encryptVolumeData")
 fi
 
@@ -80,6 +85,6 @@ exec weed -logtostderr=true server \
     -volume.fileSizeLimitMB="${FILE_SIZE_LIMIT_MB:-4096}" \
     -master.volumeSizeLimitMB="$(( "${VOLUME_SIZE_BYTES}" / 1024 / 1024 ))" \
     -master.volumePreallocate="${VOLUME_PREALLOCATE:-false}" \
-    -s3 -s3.config="${cfg}" \
     ${FLAGS[*]} \
+    -s3 -s3.config="${cfg}" \
     "$@"

@@ -1,0 +1,37 @@
+version: "3"
+services:
+  s3:
+    image: ${STORAGE_IMAGE:-quay.io/cryostat/cryostat-storage:latest}
+    hostname: s3
+    environment:
+      CRYOSTAT_BUCKETS: ${PRECREATE_BUCKETS}
+      CRYOSTAT_ACCESS_KEY: access_key
+      CRYOSTAT_SECRET_KEY: secret_key
+      DATA_DIR: /data
+      IP_BIND: 0.0.0.0
+      WEED_V: '4' # glog logging level
+    volumes:
+      - seaweed_data:/data
+    ports:
+      - "8888:8888"
+    expose:
+      - "8333"
+    labels:
+      kompose.service.expose: "seaweed"
+    restart: always
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - timeout
+        - 5s
+        - bash
+        - -c
+        - :> /dev/tcp/127.0.0.1/8333
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      timeout: 5s
+
+volumes:
+  seaweed_data:
+    driver: local
