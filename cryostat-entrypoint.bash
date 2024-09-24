@@ -63,6 +63,17 @@ STORAGE_CAPACITY=${STORAGE_CAPACITY:-${AVAILABLE_DISK_BYTES}}
 STORAGE_CAPACITY_BYTES=$(echo "${STORAGE_CAPACITY}" | numfmt --from=iec --suffix=B | tr -d 'B')
 VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
 
+FLAGS=(
+    "-filer.allowedOrigins=0.0.0.0"
+    "-filer.exposeDirectoryData=false"
+    "-filer.disableDirListing"
+    "-webdav=false"
+)
+
+if [ -z "${DISABLE_REST_ENCRYPTION}" ]; then
+    FLAGS+=("-filer.encryptVolumeData")
+fi
+
 exec weed -logtostderr=true server \
     -dir="${DATA_DIR}" \
     -volume.max=${NUM_VOLUMES} \
@@ -70,4 +81,5 @@ exec weed -logtostderr=true server \
     -master.volumeSizeLimitMB="$(( "${VOLUME_SIZE_BYTES}" / 1024 / 1024 ))" \
     -master.volumePreallocate="${VOLUME_PREALLOCATE:-false}" \
     -s3 -s3.config="${cfg}" \
+    ${FLAGS[*]} \
     "$@"
