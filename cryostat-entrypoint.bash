@@ -64,7 +64,7 @@ STORAGE_CAPACITY_BYTES=$(echo "${STORAGE_CAPACITY}" | numfmt --from=iec --suffix
 VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
 
 FLAGS=(
-    "-filer.allowedOrigins=0.0.0.0"
+    "-filer.allowedOrigins=${FILER_ORIGINS:-0.0.0.0}"
 )
 
 if [ "${DIR_LISTING_ENABLE:-0}" != 1 ]; then
