@@ -1,7 +1,7 @@
-ARG builder_version=9.4
-ARG runner_version=9.4
+ARG builder_version=9.5
+ARG runner_version=9.5
 ARG ref=master
-ARG goversion=1.22.7
+ARG goversion=1.22.9
 
 FROM registry.access.redhat.com/ubi9/ubi:${builder_version} AS builder
 ARG ref
