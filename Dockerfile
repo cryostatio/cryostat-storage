@@ -1,9 +1,9 @@
-ARG builder_version=8.10
-ARG runner_version=8.10
+ARG builder_version=9.5
+ARG runner_version=9.5
 ARG ref=master
-ARG goversion=1.22.6
+ARG goversion=1.22.9
 
-FROM registry.access.redhat.com/ubi8/ubi:${builder_version} AS builder
+FROM registry.access.redhat.com/ubi9/ubi:${builder_version} AS builder
 ARG ref
 ARG goversion
 RUN dnf install -y go git make gettext \
@@ -19,7 +19,7 @@ RUN dnf install -y go git make gettext \
     && popd \
     && popd
 
-FROM registry.access.redhat.com/ubi8/ubi-micro:${runner_version}
+FROM registry.access.redhat.com/ubi9/ubi-micro:${runner_version}
 ARG ref
 ARG goversion
 LABEL seaweedfs.version=$ref golang.version=$goversion
