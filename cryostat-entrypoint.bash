@@ -35,7 +35,6 @@ function createBuckets() {
     for name in "$@"; do
         createBucket "${name}"
     done
-    echo "Ready."
 }
 
 names=()
