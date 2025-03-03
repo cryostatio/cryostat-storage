@@ -22,7 +22,7 @@ function waitForStartup() {
         sleep "${BUCKET_CREATION_STARTUP_SECONDS:-10}"
     done
     echo "Cluster ready for bucket creation."
-    sleep "${BUCKET_CREATION_DELAY_SECONDS:-$BUCKET_CREATION_STARTUP_SECONDS}"
+    sleep "${BUCKET_CREATION_DELAY_SECONDS:-${BUCKET_CREATION_STARTUP_SECONDS:-3}}"
 }
 
 function createBucket() {
