@@ -55,13 +55,22 @@ createBuckets "${names[@]}" &
 
 set -e
 
-VOLUME_MIN=40
+VOLUME_MIN=${VOLUME_MIN:-40}
 NUM_VOLUMES=$(( ${VOLUME_MAX:-0} > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
 DATA_DIR="${DATA_DIR:-/tmp}"
-AVAILABLE_DISK_BYTES="$(df -P -B1 "${DATA_DIR}" | tail -1 | tr -s ' ' | cut -d' ' -f 4)"
-STORAGE_CAPACITY=${STORAGE_CAPACITY:-${AVAILABLE_DISK_BYTES}}
+
+# if the user specifies a STORAGE_CAPACITY they may specify it in raw byte count, or byte count with a B suffix, or
+# using other suffices like '50MB'. If the user does not specify it then we use df to check the available space on the
+# disk in raw byte count and attempt to fill all available space, or fill the maximum space that we are able to given
+# the individual volume size limit and the maximum number of volumes we will create.
+# The usage of numfmt here allows us to accept this flexible input and convert it to a byte count, then use tr to
+# remove the B suffix.
+STORAGE_CAPACITY=${STORAGE_CAPACITY:-"$(df -P -B1 "${DATA_DIR}" | tail -1 | tr -s ' ' | cut -d' ' -f 4)"}
 STORAGE_CAPACITY_BYTES=$(echo "${STORAGE_CAPACITY}" | numfmt --from=iec --suffix=B | tr -d 'B')
+
 VOLUME_SIZE_BYTES=$(( "${STORAGE_CAPACITY_BYTES}" / "${NUM_VOLUMES}" ))
+VOLUME_SIZE_BYTES_MAX=31457280000 # 30000MB, the maximum volume size SeaweedFS will create
+VOLUME_SIZE_BYTES=$(( VOLUME_SIZE_BYTES > VOLUME_SIZE_BYTES_MAX ? VOLUME_SIZE_BYTES_MAX : VOLUME_SIZE_BYTES ))
 
 FLAGS=(
     "-filer.allowedOrigins=${FILER_ORIGINS:-0.0.0.0}"
