@@ -55,7 +55,7 @@ createBuckets "${names[@]}" &
 
 set -e
 
-VOLUME_MIN=${VOLUME_MIN:-40}
+VOLUME_MIN=${VOLUME_MIN:-60}
 NUM_VOLUMES=$(( ${VOLUME_MAX:-0} > VOLUME_MIN ? VOLUME_MAX : VOLUME_MIN ))
 DATA_DIR="${DATA_DIR:-/tmp}"
 
