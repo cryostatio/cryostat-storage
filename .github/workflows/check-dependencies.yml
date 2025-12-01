@@ -26,6 +26,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v7
       with:
+        token: ${{ secrets.CI_UPDATER_PAT }}
         title: SeaweedFS ${{ env.SEAWEED_REF }}
         delete-branch: true
         sign-commits: true
