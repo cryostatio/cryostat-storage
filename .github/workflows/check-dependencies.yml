@@ -14,7 +14,7 @@ jobs:
     - name: Get SeaweedFS release ref
       run: |
         SEAWEED_REF="$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)"
-        sed -i "s/SEAWEED_VERSION=.*/SEAWEED_VERSION=$SEAWEED_REF/"
+        sed -i "s/SEAWEED_VERSION=.*/SEAWEED_VERSION=$SEAWEED_REF/" versions.env
         echo "SEAWEED_REF=$SEAWEED_REF" >> "$GITHUB_ENV"
       env:
         GH_TOKEN: ${{ github.token }}
