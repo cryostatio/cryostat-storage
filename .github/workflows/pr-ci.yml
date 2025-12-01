@@ -1,0 +1,82 @@
+name: PR CI
+
+concurrency:
+  group: ci-${{ github.run_id }}
+  cancel-in-progress: true
+
+on:
+  pull_request
+
+env:
+  CI_USER: cryostat+bot
+  CI_REGISTRY: quay.io/cryostat
+  CI_IMG: quay.io/cryostat/cryostat-storage
+  REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  REF: ${{ github.event.pull_request.head.ref }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Get SeaweedFS release ref
+      run: |
+        source versions.env
+        echo "SEAWEED_REF=$SEAWEED_VERSION" >> "$GITHUB_ENV"
+    - name: Build container image
+      id: buildah-build
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ${{ env.CI_IMG }}
+        archs: amd64
+        tags: pr-ci
+        build-args: |
+          ref=${{ env.SEAWEED_REF }}
+        containerfiles: |
+          ./Dockerfile
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/cryostat
+        ref: main
+        submodules: true
+        fetch-depth: 0
+    - uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+    - run: git submodule init && git submodule update
+    - name: Cache yarn packages
+      uses: actions/cache@v3
+      with:
+        path: "./src/main/webui/.yarn/cache"
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Initialize web assets
+      run: |
+        cd src/main/webui
+        yarn install && yarn yarn:frzinstall
+        cd -
+    - name: Add CRIU PPA
+      run: sudo add-apt-repository ppa:criu/ppa && sudo apt update
+    - name: Install podman v4
+      run: |
+        sudo apt -y purge podman
+        sudo apt -y update && sudo apt -y satisfy "podman (>= 4.0), podman-docker"
+    - name: Start Podman API
+      run: systemctl --user enable --now podman.socket
+    - name: Set DOCKER_HOST environment variable
+      run: echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> "$GITHUB_ENV"
+    - name: Build cryostat
+      env:
+        CRYOSTAT_STORAGE_VERSION: pr-ci
+      run: |
+          ./mvnw -B \
+            -Dquarkus.hibernate-orm.log.sql=false \
+            -Dquarkus.log.level=error \
+            -Dquarkus.http.access-log.enabled=false \
+            -Dquarkus.smallrye-graphql.log-payload=off \
+            clean verify

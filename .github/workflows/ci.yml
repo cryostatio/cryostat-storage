@@ -26,7 +26,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install qemu
       continue-on-error: false
       run: |
@@ -50,9 +50,9 @@ jobs:
         echo "::set-output name=image-tag-patch::${output:0:3}"
         echo "::set-output name=image-tag-release::${output:0:1}"
     - name: Get SeaweedFS release ref
-      run: echo "SEAWEED_REF=$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)" >> "$GITHUB_ENV"
-      env:
-        GH_TOKEN: ${{ github.token }}
+      run: |
+        source versions.env
+        echo "SEAWEED_REF=$SEAWEED_VERSION" >> "$GITHUB_ENV"
     - name: Build container images and manifest
       id: buildah-build
       uses: redhat-actions/buildah-build@v2
