@@ -5,9 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  repository_dispatch:
-    types: [create-pull-request]
-  pull_request:
+  pull_request
 
 env:
   CI_USER: cryostat+bot
