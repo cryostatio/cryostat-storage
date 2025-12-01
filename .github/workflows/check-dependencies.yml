@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 0 * * 2' # every Tuesday at midnight
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
