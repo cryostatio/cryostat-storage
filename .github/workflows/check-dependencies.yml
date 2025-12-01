@@ -3,7 +3,7 @@ name: Check and Update Dependencies
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 1' # every Monday at midnight
+    - cron: '0 0 * * 2' # every Tuesday at midnight
 
 jobs:
   build:
