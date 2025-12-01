@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   build:
@@ -26,4 +27,10 @@ jobs:
       uses: peter-evans/create-pull-request@v7
       with:
         title: SeaweedFS ${{ env.SEAWEED_REF }}
+        delete-branch: true
         sign-commits: true
+        team-reviewers: |
+          maintainers
+        labels: |
+          chore
+          dependencies
