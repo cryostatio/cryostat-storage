@@ -1,8 +1,6 @@
-ARG builder_version=9.6
-ARG runner_version=9.6
 ARG ref=master
 
-FROM registry.access.redhat.com/ubi9/ubi:${builder_version} AS builder
+FROM registry.access.redhat.com/ubi9/ubi:9.6 AS builder
 ARG ref
 RUN dnf install -y go git make gettext \
     && pushd /root \
@@ -12,7 +10,7 @@ RUN dnf install -y go git make gettext \
     && popd \
     && popd
 
-FROM registry.access.redhat.com/ubi9/ubi-micro:${runner_version}
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.6
 ARG ref
 LABEL seaweedfs.version=$ref
 COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /usr/bin/
