@@ -5,6 +5,13 @@ on:
   schedule:
     - cron: '0 0 * * *' # every day at midnight
 
+env:
+  CI_USER: cryostat+bot
+  CI_REGISTRY: quay.io/cryostat
+  CI_IMG: quay.io/cryostat/cryostat-storage
+  REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  REF: ${{ github.event.pull_request.head.ref }}
+
 jobs:
   build:
     if: ${{ github.repository_owner == 'cryostatio' }}
