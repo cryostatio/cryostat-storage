@@ -68,6 +68,7 @@ jobs:
     - name: Build cryostat
       env:
         CRYOSTAT_STORAGE_VERSION: nightly-ci
+        QUARKUS_S3_CHECKSUM_VALIDATION: true
       run: |
           ./mvnw -B \
             -Dquarkus.hibernate-orm.log.sql=false \
