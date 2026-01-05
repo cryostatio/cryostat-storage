@@ -85,7 +85,10 @@ if [ "${DIR_LISTING_ENABLE:-0}" != 1 ]; then
 fi
 
 if [ "${REST_ENCRYPTION_ENABLE:-1}" = 1 ]; then
-    FLAGS+=("-filer.encryptVolumeData")
+    FLAGS+=(
+        "-filer.encryptVolumeData"
+        "-s3.encryptVolumeData"
+    )
 fi
 
 exec weed -logtostderr=true server \
