@@ -1,0 +1,26 @@
+name: Check and Update Dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 2' # every Tuesday at midnight
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get SeaweedFS release ref
+      run: |
+        SEAWEED_REF="$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)"
+        sed -i "s/SEAWEED_VERSION=.*/SEAWEED_VERSION=$SEAWEED_REF/"
+        echo "SEAWEED_REF=$SEAWEED_REF" >> "$GITHUB_ENV"
+      env:
+        GH_TOKEN: ${{ github.token }}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        title: SeaweedFS ${{ env.SEAWEED_REF }}
+        sign-commits: true
