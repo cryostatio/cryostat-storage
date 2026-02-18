@@ -15,7 +15,7 @@ env:
   REF: ${{ github.event.pull_request.head.ref }}
 
 jobs:
-  build:
+  pr_build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
