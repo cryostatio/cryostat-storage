@@ -16,7 +16,15 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
-    - name: Get SeaweedFS release ref
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        git_user_signingkey: true
+        git_commit_gpgsign: true
+
+    - name: Set SeaweedFS release ref
       run: |
         SEAWEED_REF="$(gh release list --repo=seaweedfs/seaweedfs | head -n1 | column -t | cut -d ' ' -f 1)"
         sed -i "s/SEAWEED_VERSION=.*/SEAWEED_VERSION=$SEAWEED_REF/" versions.env
@@ -24,17 +32,21 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
 
+    - name: Commit
+      env:
+        GH_TOKEN: ${{ secrets.SUBMODULE_TOKEN }}
+      run: |
+        git add --all
+        title="build(seaweedfs): update to ${{ env.SEAWEED_REF }}"
+        body="see https://github.com/seaweedfs/seaweedfs/releases/tag/${{ env.SEAWEED_REF }}"
+        git commit -S -m "${title}" -m "${body}"
+
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v8
       with:
         title: SeaweedFS ${{ env.SEAWEED_REF }}
+        branch: updater/seaweed-${{ env.SEAWEED_REF }}
         branch-token: ${{ secrets.CI_UPDATER_PAT }}
         push-to-fork: cryostat-bot/cryostat-storage
         maintainer-can-modify: false
         delete-branch: true
-        sign-commits: true
-        team-reviewers: |
-          maintainers
-        labels: |
-          chore
-          dependencies
