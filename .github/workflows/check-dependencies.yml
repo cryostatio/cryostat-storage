@@ -46,7 +46,7 @@ jobs:
       with:
         title: SeaweedFS ${{ env.SEAWEED_REF }}
         branch: updater/seaweed-${{ env.SEAWEED_REF }}
-        branch-token: ${{ secrets.CI_UPDATER_PAT }}
+        token: ${{ secrets.CI_UPDATER_PAT }}
         push-to-fork: cryostat-bot/cryostat-storage
         maintainer-can-modify: false
         delete-branch: true
