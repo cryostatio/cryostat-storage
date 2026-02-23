@@ -6,6 +6,4 @@ DIR="$(dirname "$(readlink -f "$0")")"
 
 BUILDER="${BUILDER:-podman}"
 
-source "${DIR}/versions.env"
-
-${BUILDER} build "${DIR}" -f "${DIR}/Dockerfile" --build-arg ref="${SEAWEED_VERSION:-master}" -t quay.io/cryostat/cryostat-storage:latest
+${BUILDER} build "${DIR}" -f "${DIR}/Dockerfile" -t "${IMAGE:-quay.io/cryostat/cryostat-storage:latest}"

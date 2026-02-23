@@ -1,4 +1,4 @@
-ARG ref=master
+ARG ref=4.13
 
 FROM registry.access.redhat.com/ubi9/ubi:9.7-1771346757 AS builder
 ARG ref

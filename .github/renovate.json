@@ -4,6 +4,29 @@
     "config:recommended",
     ":dependencyDashboard"
   ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "ARG ref=(?<currentValue>.*)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageName": "seaweedfs/seaweedfs",
+      "versioning": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["regex"],
+      "matchPackageNames": ["seaweedfs/seaweedfs"],
+      "groupName": "seaweedfs",
+      "groupSlug": "seaweedfs",
+      "commitMessageTopic": "seaweedfs",
+      "commitMessageExtra": "to update to {{newVersion}}",
+      "branchTopic": "seaweedfs-v{{newVersion}}",
+      "prTitle": "build(seaweedfs): update to {{newVersion}}",
+      "prBody": "Updates [seaweedfs](https://github.com/seaweedfs/seaweedfs) from {{currentVersion}} to {{newVersion}}."    }
+  ],
   "reviewersFromCodeOwners": true,
   "labels": [
     "dependencies",
