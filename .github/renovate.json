@@ -4,6 +4,17 @@
     "config:recommended",
     ":dependencyDashboard"
   ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": [
+        "ARG SEAWEED_VERSION=(?<currentValue>.*?)\\n"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "seaweedfs/seaweedfs"
+    }
+  ],
   "reviewersFromCodeOwners": true,
   "labels": [
     "dependencies",
