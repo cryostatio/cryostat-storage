@@ -19,10 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
-    - name: Get SeaweedFS release ref
-      run: |
-        source versions.env
-        echo "SEAWEED_REF=$SEAWEED_VERSION" >> "$GITHUB_ENV"
     - name: Build container image
       id: buildah-build
       uses: redhat-actions/buildah-build@v2
@@ -30,8 +26,6 @@ jobs:
         image: ${{ env.CI_IMG }}
         archs: amd64
         tags: pr-ci
-        build-args: |
-          ref=${{ env.SEAWEED_REF }}
         containerfiles: |
           ./Dockerfile
     - uses: actions/checkout@v6
