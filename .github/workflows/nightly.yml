@@ -66,9 +66,12 @@ jobs:
     - name: Set DOCKER_HOST environment variable
       run: echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> "$GITHUB_ENV"
     - name: Build cryostat
+      uses: Wandalen/wretry.action@v3.8.0
       env:
         CRYOSTAT_STORAGE_VERSION: nightly-ci
-      run: |
+      with:
+        attempt_limit: 3
+        command: |
           ./mvnw -B \
             -Dquarkus.hibernate-orm.log.sql=false \
             -Dquarkus.log.level=error \
