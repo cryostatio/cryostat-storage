@@ -56,6 +56,7 @@ createBuckets "${names[@]}" &
 set -e
 
 exec weed -logtostderr=true mini \
+    -master.resumeState=false \
     -admin.ui=false \
     -filer.allowedOrigins="${FILER_ORIGINS:-0.0.0.0}" \
     -filer.encryptVolumeData \
