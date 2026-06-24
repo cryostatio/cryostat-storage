@@ -1,6 +1,6 @@
 ARG SEAWEED_VERSION=4.35
 
-FROM registry.access.redhat.com/ubi9/ubi:9.8-1782121068@sha256:13a41a28c5479292bcaed42255532f64f891d976340f83a7d8546ad0a2f55a51 AS builder
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1782277275@sha256:a729da793c5f57633fc0dfbe99ced541aedde3ea653d5344af5aabb49f5aeb89 AS builder
 ARG SEAWEED_VERSION
 RUN dnf install -y go git make gettext \
     && pushd /root \
