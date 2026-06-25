@@ -1,4 +1,4 @@
-ARG SEAWEED_VERSION=4.35
+ARG SEAWEED_VERSION=4.36
 
 FROM registry.access.redhat.com/ubi9/ubi:9.8-1782277275@sha256:a729da793c5f57633fc0dfbe99ced541aedde3ea653d5344af5aabb49f5aeb89 AS builder
 ARG SEAWEED_VERSION
