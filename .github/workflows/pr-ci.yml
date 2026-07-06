@@ -40,5 +40,3 @@ jobs:
     with:
       java-version: '25'
       storage-image-tag: pr-ci
-      run-unit-tests: true
-      run-integration-tests: true
