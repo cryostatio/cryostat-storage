@@ -39,3 +39,4 @@ jobs:
     uses: ./.github/workflows/test-cryostat.yml
     with:
       storage-image: quay.io/cryostat/cryostat-storage:pr-ci
+      attempt-limit: 1

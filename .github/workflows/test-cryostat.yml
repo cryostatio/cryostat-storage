@@ -6,6 +6,10 @@ on:
       storage-image:
         required: true
         type: string
+      attempt-limit:
+        required: false
+        type: number
+        default: 3
 
 jobs:
   unit-test:
@@ -41,7 +45,7 @@ jobs:
       env:
         CRYOSTAT_STORAGE_IMAGE: ${{ inputs.storage-image }}
       with:
-        attempt_limit: 3
+        attempt_limit: ${{ inputs.attempt-limit }}
         command: |
           ./mvnw -B -U \
             -Dquarkus.hibernate-orm.log.sql=false \
@@ -107,7 +111,7 @@ jobs:
       env:
         CRYOSTAT_STORAGE_IMAGE: ${{ inputs.storage-image }}
       with:
-        attempt_limit: 3
+        attempt_limit: ${{ inputs.attempt-limit }}
         command: |
           ./mvnw -B -U \
             -Dquarkus.hibernate-orm.log.sql=false \
