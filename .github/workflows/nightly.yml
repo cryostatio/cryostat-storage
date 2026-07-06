@@ -35,5 +35,5 @@ jobs:
     needs: build
     uses: ./.github/workflows/test-cryostat.yml
     with:
-      java-version: '21'
+      java-version: '25'
       storage-image-tag: nightly-ci
