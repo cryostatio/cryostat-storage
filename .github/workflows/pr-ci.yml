@@ -38,5 +38,4 @@ jobs:
     needs: pr_build
     uses: ./.github/workflows/test-cryostat.yml
     with:
-      java-version: '25'
       storage-image-tag: pr-ci
