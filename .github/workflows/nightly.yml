@@ -35,4 +35,4 @@ jobs:
     needs: build
     uses: ./.github/workflows/test-cryostat.yml
     with:
-      storage-image-tag: nightly-ci
+      storage-image: quay.io/cryostat/cryostat-storage:nightly-ci

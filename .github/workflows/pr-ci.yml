@@ -38,4 +38,4 @@ jobs:
     needs: pr_build
     uses: ./.github/workflows/test-cryostat.yml
     with:
-      storage-image-tag: pr-ci
+      storage-image: quay.io/cryostat/cryostat-storage:pr-ci
