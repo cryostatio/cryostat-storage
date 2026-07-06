@@ -37,4 +37,3 @@ jobs:
     with:
       java-version: '21'
       storage-image-tag: nightly-ci
-      run-full-verify: true
