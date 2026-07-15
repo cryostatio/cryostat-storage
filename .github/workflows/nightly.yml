@@ -29,49 +29,16 @@ jobs:
           ref=master
         containerfiles: |
           ./Dockerfile
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - name: Save container image
+      run: podman save -o cryostat-storage.tar --format oci-archive ${{ env.CI_IMG }}:nightly-ci
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
-        repository: ${{ github.repository_owner }}/cryostat
-        ref: main
-        submodules: true
-        fetch-depth: 0
-    - uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: 'maven'
-    - run: git submodule init && git submodule update
-    - name: Cache yarn packages
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      with:
-        path: "./src/main/webui/.yarn/cache"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: Initialize web assets
-      run: |
-        cd src/main/webui
-        yarn install && yarn yarn:frzinstall
-        cd -
-    - name: Install podman-docker
-      run: |
-        sudo apt -y update && sudo apt -y install "podman-docker"
-    - name: Start Podman API
-      run: systemctl --user enable --now podman.socket
-    - name: Set DOCKER_HOST environment variable
-      run: echo "DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock" >> "$GITHUB_ENV"
-    - name: Build cryostat
-      uses: Wandalen/wretry.action@e68c23e6309f2871ca8ae4763e7629b9c258e1ea # v3.8.0
-      env:
-        CRYOSTAT_STORAGE_VERSION: nightly-ci
-      with:
-        attempt_limit: 3
-        command: |
-          ./mvnw -B \
-            -Dquarkus.hibernate-orm.log.sql=false \
-            -Dquarkus.log.level=error \
-            -Dquarkus.http.access-log.enabled=false \
-            -Dquarkus.smallrye-graphql.log-payload=off \
-            clean verify
+        name: cryostat-storage
+        path: cryostat-storage.tar
+
+  test:
+    if: ${{ github.repository_owner == 'cryostatio' }}
+    needs: build
+    uses: ./.github/workflows/test-cryostat.yml
+    with:
+      storage-image: quay.io/cryostat/cryostat-storage:nightly-ci
