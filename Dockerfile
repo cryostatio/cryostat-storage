@@ -10,7 +10,7 @@ RUN dnf install -y go git make gettext \
     && popd \
     && popd
 
-FROM registry.access.redhat.com/ubi9/ubi-micro:9.8-1782363471@sha256:fdf68a4f5f88cca14ae906bbec6e0fbbffe92b5b91e73e0862c961234d63b986
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.8-1782840931@sha256:35de56a9413112f1474e392ebc35e0cf6f0fb484c8e8877bbae59b513694b41f
 ARG SEAWEED_VERSION
 LABEL seaweedfs.version=$SEAWEED_VERSION
 COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /usr/bin/
