@@ -1,6 +1,6 @@
 ARG SEAWEED_VERSION=4.19
 
-FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651 AS builder
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1779808651@sha256:8942b73866f8434571d6fc4c10cbebd48982995d2249c39302e4d71e7df3afd9 AS builder
 ARG SEAWEED_VERSION
 RUN dnf install -y go git make gettext \
     && pushd /root \
@@ -10,7 +10,7 @@ RUN dnf install -y go git make gettext \
     && popd \
     && popd
 
-FROM registry.access.redhat.com/ubi9/ubi-micro:9.8-1779773398
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.8-1779773398@sha256:dbee6ddfcf53e1786845b8f29219946e202d99c3afac69799c2dc4edec8b937d
 ARG SEAWEED_VERSION
 LABEL seaweedfs.version=$SEAWEED_VERSION
 COPY --from=builder /usr/bin/envsubst /root/go/bin/weed /usr/bin/
