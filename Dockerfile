@@ -1,6 +1,6 @@
 ARG ref=master
 
-FROM registry.access.redhat.com/ubi9/ubi:9.7-1771346757 AS builder
+FROM registry.access.redhat.com/ubi9/ubi:9.9-1795197514@sha256:6636b79fba9e5044360366f189333c30b5ce528efd92c40c68b074592b971fcd AS builder
 ARG ref
 RUN dnf install -y go git make gettext \
     && pushd /root \
