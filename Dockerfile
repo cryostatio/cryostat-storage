@@ -1,4 +1,4 @@
-ARG builder_version=8.10
+ARG builder_version=8.10-1795422943@sha256:432e88be04b5561187a01fe33429cd2ce7a8408a00f000d8136df368dcab306f
 ARG runner_version=8.10
 ARG ref=master
 ARG goversion=1.22.6
